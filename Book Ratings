@@ -44,12 +44,6 @@ SELECT *
 FROM book_ratings
 ORDER BY rating desc;
 
---Display the average rating from 2023
-
-SELECT year_read, AVG(rating)
-FROM book_ratings
-WHERE year_read = 2023;
-
 --Display the average rating per year
 
 SELECT year_read, AVG(rating)
@@ -69,3 +63,9 @@ SELECT year_read, COUNT(rating) AS number_of_ratings
 FROM book_ratings
 WHERE rating >=4
 GROUP BY year_read;
+
+--Display the book titles for books read in 2023 with a rating of 1
+
+SELECT title
+FROM book_ratings
+WHERE rating=1 AND year_read=2023;
