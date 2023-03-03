@@ -65,7 +65,7 @@ ORDER BY rating;
 
 --Display the number of books rated 4 or higher grouped by year
 
-SELECT year_read, COUNT(rating)
+SELECT year_read, COUNT(rating) AS number_of_ratings
 FROM book_ratings
 WHERE rating >=4
 GROUP BY year_read;
