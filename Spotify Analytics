@@ -58,3 +58,13 @@ SELECT track_name, danceability, energy, tempo
 FROM BIT_DB.Spotifydata
 ORDER BY popularity desc
 LIMIT 5;
+
+--Using a temporary table, list the artists with an average popularity of 90 or higher as top stars.
+WITH average_popularity_cte AS(
+SELECT s.artist_name, AVG(s.popularity) AS average_popularity
+FROM Spotifydata s
+GROUP BY s.artist_name
+)
+SELECT artist_name, average_popularity, 'Top Star' AS tag
+FROM average_popularity_cte
+WHERE average_popularity>=90;
