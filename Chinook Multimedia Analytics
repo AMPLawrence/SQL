@@ -1,0 +1,70 @@
+--In this SQL code, I am querying a database with multiple (11) tables to answer questions about a multimedia store.
+
+--Show Customers (their full names, customer ID, and country) who are not in the US. 
+SELECT CustomerId, FirstName, LastName, Country
+FROM chinook.customers
+WHERE Country <> "USA";
+
+--Find the full name, invoice ID, and date of invoice for customers living in Portugal.
+SELECT FirstName, LastName, InvoiceId, InvoiceDate, Country
+FROM chinook.customers cust
+JOIN chinook.invoices inv
+ON cust.CustomerId = inv.CustomerId
+WHERE Country = "Portugal";
+
+--Display the name of all tracks and their genre
+SELECT t.Name, g.Name
+FROM chinook.tracks t
+INNER JOIN chinook.genres g
+ON t.GenreId = g.GenreId;
+
+--Display all video file tracks and their genre
+SELECT t.Name AS track_name, m.Name AS media_type_name, g.Name AS genre_name
+FROM chinook.tracks t
+INNER JOIN chinook.genres g
+ON t.GenreId = g.GenreId
+INNER JOIN chinook.media_types m
+ON t.MediaTypeId = m.MediaTypeId
+WHERE m.Name LIKE "%video file";
+
+--What is the total revenue for each year 2009 through 2013
+SELECT strftime('%Y', InvoiceDate) AS Year, ROUND(SUM(Total),2) AS Revenue
+FROM chinook.invoices
+GROUP BY Year; 
+
+--List the unit price of each track
+SELECT t.Name, i.UnitPrice
+FROM chinook.tracks t
+INNER JOIN chinook.invoice_items i
+ON t.TrackId = i.TrackId;
+
+--How many tracks are on each album?
+SELECT a.Title, COUNT(t.TrackId) AS num_tracks
+FROM chinook.albums a
+LEFT OUTER JOIN chinook.tracks t
+ON a.AlbumId = t.AlbumId
+GROUP BY a.Title;
+
+--How many albums does each artist have?
+SELECT ar.Name, COUNT(al.AlbumId) AS num_albums
+FROM chinook.artists ar
+LEFT OUTER JOIN chinook.albums al
+ON ar.ArtistId = al.ArtistId
+GROUP BY ar.Name;
+
+--list customers and their contact information (email and phone #) for customers who spent $25.00 or more
+SELECT cust.FirstName, cust.LastName, cust.Email, cust.Phone, SUM(total) AS total_spent
+FROM chinook.customers cust
+LEFT OUTER JOIN chinook.invoices inv
+ON cust.CustomerId = inv.CustomerId
+GROUP BY cust.CustomerId
+HAVING SUM(Total) >=25;
+
+--Display the total sales for each sales agent. Include agents without sales.
+SELECT emp.FirstName, emp.LastName, ROUND(SUM(inv.Total),2) AS total_sale
+FROM chinook.customers cust
+FULL OUTER JOIN chinook.employees emp
+ON cust.SupportRepId = emp.EmployeeId
+FULL OUTER JOIN chinook.invoices inv
+ON cust.CustomerId = inv.CustomerId
+GROUP BY emp.EmployeeId;
