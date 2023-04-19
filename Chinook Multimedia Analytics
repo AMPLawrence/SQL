@@ -1,5 +1,27 @@
 --In this SQL code, I am querying a database with multiple (11) tables to answer questions about a multimedia store.
 
+--Display the total sales for each sales agent. Include agents without sales. Include an additional column to display the average amount per sale for each employee.
+SELECT emp.FirstName, emp.LastName, ROUND(SUM(inv.Total),2) AS total_sale, AVG(inv.Total) OVER (partition by emp.FirstName) AS avg_sale_amt
+FROM chinook.customers cust
+FULL OUTER JOIN chinook.employees emp
+ON cust.SupportRepId = emp.EmployeeId
+FULL OUTER JOIN chinook.invoices inv
+ON cust.CustomerId = inv.CustomerId
+GROUP BY emp.EmployeeId;
+
+--Create a list of users, email addresses, total spend, and a column to determine what type of coupon to spend based on the amount the customer spent
+SELECT cust.FirstName, cust.LastName, cust.Email, SUM(total) AS total_spent,
+CASE
+    WHEN SUM(total) >=40 THEN 'Send 15% off coupon'
+    WHEN SUM(total) <40 AND SUM(total)>=35 THEN 'Send 10% off coupon'
+    ELSE 'Do not send coupon'
+    END AS coupon
+FROM chinook.customers cust
+LEFT OUTER JOIN chinook.invoices inv
+ON cust.CustomerId = inv.CustomerId
+GROUP BY cust.CustomerId
+ORDER BY total_spent DESC;
+
 --Show Customers (their full names, customer ID, and country) who are not in the US. 
 SELECT CustomerId, FirstName, LastName, Country
 FROM chinook.customers
@@ -59,12 +81,3 @@ LEFT OUTER JOIN chinook.invoices inv
 ON cust.CustomerId = inv.CustomerId
 GROUP BY cust.CustomerId
 HAVING SUM(Total) >=25;
-
---Display the total sales for each sales agent. Include agents without sales.
-SELECT emp.FirstName, emp.LastName, ROUND(SUM(inv.Total),2) AS total_sale
-FROM chinook.customers cust
-FULL OUTER JOIN chinook.employees emp
-ON cust.SupportRepId = emp.EmployeeId
-FULL OUTER JOIN chinook.invoices inv
-ON cust.CustomerId = inv.CustomerId
-GROUP BY emp.EmployeeId;
