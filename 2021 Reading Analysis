@@ -1,6 +1,49 @@
 --This file contains SQL code that analyzes my reading habits from 2021. 
 
 
+--Compare the rating of each book to the average rating of that genre, mood, and pace see how the individual rating compares to the average genre, mood, and pace rating.
+
+SELECT Title, My_Rating, AVG(My_Rating) OVER (PARTITION BY Genre) AS Average_Genre_Rating, 
+	CASE 
+		WHEN AVG(My_Rating) OVER (PARTITION BY Genre) > My_Rating THEN 'Rating low for genre'
+		WHEN AVG(My_Rating) OVER (PARTITION BY Genre) < My_Rating THEN 'Rating high for genre'
+		ELSE 'Rating average for genre'
+	END AS Rating_for_Genre,
+	AVG(My_Rating) OVER (PARTITION BY Mood) AS Average_Mood_Rating,
+	CASE
+		WHEN AVG(My_Rating) OVER (PARTITION BY Mood) > My_Rating THEN 'Rating low for mood'
+		WHEN AVG(My_Rating) OVER (PARTITION BY Mood) < My_Rating THEN 'Rating high for mood'
+		ELSE 'Rating average for mood'
+	END AS rating_for_mood,
+	AVG(My_Rating) OVER (PARTITION BY Pace) AS Average_Pace_Rating,
+	CASE
+		WHEN AVG(My_Rating) OVER (PARTITION BY Pace) > My_Rating THEN 'Rating low for pace'
+		WHEN AVG(My_Rating) OVER (PARTITION BY Pace) < My_Rating THEN 'Rating high for pace'
+		ELSE 'Rating average for pace'
+	END rating_for_pace
+FROM dbo.books_read_2021
+ORDER BY My_Rating DESC;
+
+
+--Books read by format.
+
+SELECT COUNT(Format) AS Format_Count,
+	CASE
+		WHEN Format = 'Audio' THEN 'Audio Book Count'
+		ELSE 'Physical Book Count'
+	END AS Book_Format
+FROM dbo.books_read_2021
+GROUP BY Format;
+
+
+--The most frequently read publication year.
+
+SELECT Publication_Year
+FROM dbo.books_read_2021
+WHERE Publication_Year = (SELECT MAX(Publication_Year) FROM dbo.books_read_2021)
+GROUP BY Publication_Year
+
+
 --The shortest and longest book I read in 2021.
 
 SELECT Title, Num_Pages
@@ -9,15 +52,25 @@ WHERE Num_Pages = (SELECT MAX(Num_Pages) FROM dbo.books_read_2021) OR Num_Pages 
 
 
 --Worst rated book of the year (based on my ratings).
+
 SELECT Title
 FROM dbo.books_read_2021
 WHERE My_Rating = (SELECT MIN(My_Rating) FROM dbo.books_read_2021);
 
 
 --Worst rated book on Goodreads
+
 SELECT Title
 FROM dbo.books_read_2021
 WHERE Avg_Goodreads_Rating = (SELECT MIN(Avg_Goodreads_Rating) FROM dbo.books_read_2021);
+
+
+--Rank months by average overall rating
+
+SELECT Month_Read, ROUND(AVG(My_Rating),2) AS average_rating
+FROM dbo.books_read_2021
+GROUP BY Month_Read
+ORDER BY average_rating DESC
 
 
 --My overall avearage rating for the year vs. the average overall Goodreads rating for the books I read in 2021.
@@ -26,7 +79,7 @@ SELECT ROUND(AVG(My_Rating),2) AS Average_Rating, ROUND(AVG(Avg_Goodreads_Rating
 FROM dbo.books_read_2021;
 
 
---My average rating of book by genre.
+--My average rating per genre.
 
 SELECT DISTINCT genre, ROUND(AVG(My_Rating),2) AS Avg_Rating_by_genre
 FROM dbo.books_read_2021
@@ -34,7 +87,7 @@ GROUP BY Genre
 ORDER BY AVG_Rating_by_genre DESC;
 
 
---My average rating of book by pace.
+--My average rating per pace.
 
 SELECT DISTINCT Pace, ROUND(AVG(My_Rating),2) AS Avg_Rating_by_Pace
 FROM dbo.books_read_2021
@@ -100,3 +153,19 @@ GROUP BY Fiction_Nonfiction;
 SELECT Title
 FROM dbo.books_read_2021
 WHERE My_Rating = 5;
+
+
+--Count of fiction & nonfiction
+SELECT COUNT(Fiction_Nonfiction) AS Fic_Nonfic_Count,
+	CASE
+		WHEN Fiction_Nonfiction = 'Fiction' THEN 'Fiction'
+		ELSE 'Non-Fiction'
+	END AS Fiction_or_Nonfiction
+FROM dbo.books_read_2021
+GROUP BY Fiction_Nonfiction
+
+
+--Average book lenth
+
+SELECT AVG(Num_Pages) AS avg_num_of_pages
+FROM dbo.books_read_2021
