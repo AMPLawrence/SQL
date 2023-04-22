@@ -1,0 +1,102 @@
+--This file contains SQL code that analyzes my reading habits from 2021. 
+
+
+--The shortest and longest book I read in 2021.
+
+SELECT Title, Num_Pages
+FROM dbo.books_read_2021
+WHERE Num_Pages = (SELECT MAX(Num_Pages) FROM dbo.books_read_2021) OR Num_Pages = (SELECT Min(Num_Pages) FROM dbo.books_read_2021);
+
+
+--Worst rated book of the year (based on my ratings).
+SELECT Title
+FROM dbo.books_read_2021
+WHERE My_Rating = (SELECT MIN(My_Rating) FROM dbo.books_read_2021)
+
+
+--Worst rated book on Goodreads
+SELECT Title
+FROM dbo.books_read_2021
+WHERE Avg_Goodreads_Rating = (SELECT MIN(Avg_Goodreads_Rating) FROM dbo.books_read_2021)
+
+
+--My overall avearage rating for the year vs. the average overall Goodreads rating for the books I read in 2021.
+
+SELECT ROUND(AVG(My_Rating),2) AS Average_Rating, ROUND(AVG(Avg_Goodreads_Rating),2) AS Average_Goodreads_Rating
+FROM dbo.books_read_2021;
+
+
+--My average rating of book by genre.
+
+SELECT DISTINCT genre, ROUND(AVG(My_Rating),2) AS Avg_Rating_by_genre
+FROM dbo.books_read_2021
+GROUP BY Genre
+ORDER BY AVG_Rating_by_genre DESC;
+
+
+--My average rating of book by pace.
+
+SELECT DISTINCT Pace, ROUND(AVG(My_Rating),2) AS Avg_Rating_by_Pace
+FROM dbo.books_read_2021
+GROUP BY Pace
+ORDER BY AVG_Rating_by_Pace DESC;
+
+
+--My average rating of book by mood.
+
+SELECT Mood, ROUND(AVG(My_Rating),2) AS Average_Rating
+FROM dbo.books_read_2021
+GROUP BY Mood
+ORDER BY Average_Rating DESC;
+
+
+--Books read each month.
+
+SELECT Month_Read, COUNT (*) AS Books_per_Month
+FROM dbo.books_read_2021
+GROUP BY Month_Read;
+
+
+--Authors read ranked by average rating.
+
+SELECT Author, ROUND(AVG(My_Rating),2) AS Average_Rating
+FROM dbo.books_read_2021
+GROUP BY Author
+ORDER BY Average_Rating DESC;
+
+
+--Most-read author of 2021.
+
+SELECT Author, COUNT(Author) AS author_count
+FROM dbo.books_read_2021
+GROUP BY Author
+ORDER BY author_count DESC
+LIMIT 1;
+
+
+--Number of books read that were part of a series.
+
+SELECT COUNT(*)
+FROM dbo.books_read_2021
+WHERE Series <> 'N/A';
+
+
+--Books read by genre.
+
+SELECT genre, COUNT(*) AS #_of_Books
+FROM dbo.books_read_2021
+GROUP BY Genre
+ORDER BY #_of_Books DESC;
+
+
+--Number of fiction vs. non-fiction books read
+
+SELECT Fiction_Nonfiction, COUNT(Fiction_Nonfiction)
+FROM dbo.books_read_2021
+GROUP BY Fiction_Nonfiction;
+
+
+--Books rated 5 stars
+SELECT Title
+FROM dbo.books_read_2021
+WHERE My_Rating = 5;
