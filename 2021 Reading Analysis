@@ -11,13 +11,13 @@ WHERE Num_Pages = (SELECT MAX(Num_Pages) FROM dbo.books_read_2021) OR Num_Pages 
 --Worst rated book of the year (based on my ratings).
 SELECT Title
 FROM dbo.books_read_2021
-WHERE My_Rating = (SELECT MIN(My_Rating) FROM dbo.books_read_2021)
+WHERE My_Rating = (SELECT MIN(My_Rating) FROM dbo.books_read_2021);
 
 
 --Worst rated book on Goodreads
 SELECT Title
 FROM dbo.books_read_2021
-WHERE Avg_Goodreads_Rating = (SELECT MIN(Avg_Goodreads_Rating) FROM dbo.books_read_2021)
+WHERE Avg_Goodreads_Rating = (SELECT MIN(Avg_Goodreads_Rating) FROM dbo.books_read_2021);
 
 
 --My overall avearage rating for the year vs. the average overall Goodreads rating for the books I read in 2021.
