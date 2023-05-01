@@ -1,4 +1,4 @@
---In this SQL code, I am cleaning and analyzing survey data from 2016 in regards to mental health in tech. 
+--In this SQL code, I am cleaning and analyzing survey data from 2014 in regards to mental health in tech. 
 --Please find the data site here: https://www.kaggle.com/datasets/osmi/mental-health-in-tech-survey
 
 --Data Cleaning Process:
@@ -24,7 +24,7 @@ WHERE Gender = 'Woman' OR Gender = 'Femake' OR Gender = 'femail' OR Gender = 'Ci
 
 --Updates all applicable gender entries to Female (Trans).
 UPDATE dbo.Survey_Data
-SET Gender = 'Female (Trans)'
+SET Gender = 'Transgender'
 WHERE Gender = 'Trans woman' OR Gender = 'Female (trans)' OR Gender = 'Trans-female'
 
 --Updates all applicable gender entries to Non-Binary.
@@ -47,10 +47,14 @@ WHERE Age < 18
 
 --Clean company size data
 
---Remove dates from number of employees and set the value to NULL
+--Remove dates from company size and change it to the correct number range.
 UPDATE dbo.Survey_Data
-SET no_employees = 'Unknown'
-WHERE no_employees = '25-Jun' OR no_employees = '5-Jan'
+SET no_employees = '1-5'
+WHERE no_employees = '5-Jan'
+
+UPDATE dbo.Survey_Data
+SET no_employees = '6-25'
+WHERE no_employees = '25-Jun'
 
 
 --Clean Geographical Data
@@ -59,7 +63,7 @@ WHERE no_employees = '25-Jun' OR no_employees = '5-Jan'
 SELECT * 
 FROM dbo.Survey_Data
 WHERE Country <> 'United States' AND state <> 'NA'
---4 rows found
+--3 rows found
 
 --Change rows where the country is not the united states to 'N/A'
 UPDATE dbo.Survey_Data
@@ -68,8 +72,12 @@ WHERE Country <> 'United States'
 
 
 --Cleaning up not applicable (N/A values).
---Updated 'NA' to 'N/A' in multiple columns (see below):
+--Updated 'NA' to 'N/A' in multiple columns for clarity (see below):
 
 UPDATE dbo.Survey_Data
 SET self_employed = 'N/A'
 WHERE self_employed = 'NA'
+
+UPDATE dbo.Survey_Data
+SET work_interfere = 'N/A'
+WHERE work_interfere = 'NA'
